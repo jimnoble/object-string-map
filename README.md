@@ -15,7 +15,7 @@ public class AccountFileKey
     DateTime CreateTime { get; set; }
 }
 ```
-- Create a map that describes how to turn your data to and from a string. The syntax is the same as C# 6.0's new string interpolation feature:
+- Create a map that describes how to turn your data to and from a string:
 ```
 var map = new StringMap<AccountFileKey>(
     "/accounts/{AccountId}/{CreateTime:yyyy/MM/dd}/data.json");
