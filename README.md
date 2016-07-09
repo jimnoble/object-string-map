@@ -1,6 +1,8 @@
 # Object-String Map
 
-Use a text map to turn objects into strings and back again. Good for moving structured data into and out of file paths and URLs.
+Use a text map to turn objects into strings and back again. 
+
+Good for moving structured data into and out of file paths and URLs.
 
 ## Use
 
