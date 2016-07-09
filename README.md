@@ -6,7 +6,7 @@ Good for moving structured data into and out of file paths and URLs.
 
 ## Use
 
-- Create a class for your data. A flat POCO with simple types such as int, string, Guid and DateTime:
+Create a class for your data. A flat POCO with simple types such as int, string, Guid and DateTime:
 ```
 public class AccountFileKey
 {
@@ -15,12 +15,12 @@ public class AccountFileKey
     DateTime CreateTime { get; set; }
 }
 ```
-- Create a map that describes how to turn your data to and from a string:
+Create a map that describes how to turn your data to and from a string:
 ```
 var map = new StringMap<AccountFileKey>(
     "/accounts/{AccountId}/{CreateTime:yyyy/MM/dd}/data.json");
 ```
-- Use the map to turn an object into a string:
+Use the map to turn an object into a string:
 ```
 var obj = new AccountFileKey
 {
@@ -33,7 +33,7 @@ var str = map.Map(obj);
 
 // str == "/accounts/1234/2016/07/09/data.json"
 ```
-- Or use the map to turn a string into an object:
+Or use the map to turn a string into an object:
 ```
 var str = "/accounts/1234/2016/07/09/data.json";
 
