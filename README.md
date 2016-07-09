@@ -4,7 +4,7 @@ Use a text map to turn objects into strings and back again.
 
 Good for moving structured data into and out of file paths and URLs.
 
-## Use
+## Usage
 
 Create a class for your data. A flat POCO with simple types such as int, string, Guid and DateTime:
 ```
