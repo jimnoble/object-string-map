@@ -54,6 +54,6 @@ var fileKey = new FileKey
 ```
 You can create a partial string that will be as complete as possible from left to right, stopping once a needed value is null:
 ```
-var str = map.Map(fileKey);
+var str = map.Map(fileKey, allowPartialMap: true);
 ```
 Here `str` will have a value of `/accounts/1234/`.
