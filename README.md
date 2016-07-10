@@ -53,7 +53,7 @@ var fileKey = new FileKey
     CreateTime = null // or just omit this for the default of null.
 };
 ```
-You can create a partial string that will be as complete as possible from left to right, stopping once it needs a value that is null:
+You can create a partial string that will be as complete as possible from left to right, stopping once a needed value is null:
 ```
 var str = map.Map(fileKey);
 ```
