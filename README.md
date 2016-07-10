@@ -57,4 +57,3 @@ You can create a partial string that will be as complete as possible from left t
 var str = map.Map(fileKey);
 ```
 Here `str` will have a value of `/accounts/1234/`.
-```
