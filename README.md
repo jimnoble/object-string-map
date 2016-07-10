@@ -66,4 +66,4 @@ var map = new StringMap<int>("/accounts/{this}");
 
 var str = map.Map(123);
 ```
-Here `str` will be `/accounts/123`
+Here `str` will be `/accounts/123`.
