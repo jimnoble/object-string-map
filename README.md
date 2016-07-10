@@ -8,7 +8,7 @@ Good for moving structured data into and out of file paths and URLs.
 
 Create a class for your data. A flat POCO with simple types such as `int`, `string`, `Guid` and `DateTime`:
 ```
-public class AccountFileKey
+public class FileKey
 {
     int AccountId { get; set; }
     
@@ -17,12 +17,12 @@ public class AccountFileKey
 ```
 Create a new `StringMap` that describes how to turn your data to and from a string:
 ```
-var map = new StringMap<AccountFileKey>(
+var map = new StringMap<FileKey>(
     "/accounts/{AccountId}/{CreateTime:yyyy/MM/dd}/data.json");
 ```
 Use the map to turn an object into a string:
 ```
-var obj = new AccountFileKey
+var obj = new FileKey
 {
     AccountId = 1234,
     
@@ -30,17 +30,16 @@ var obj = new AccountFileKey
 };
 
 var str = map.Map(obj);
-
-// str == "/accounts/1234/2016/07/09/data.json"
 ```
-Or use the map to turn a string into an object:
+Here `str` will be `/accounts/1234/2016/07/09/data.json`.
+
+Use the map to turn a string into an object:
 ```
 var str = "/accounts/1234/2016/07/09/data.json";
 
 var obj = map.Map(str);
-
-// obj should equal obj from the above example
 ```
+Here `obj` will equal the `FileKey` defined above.
 
 ## Partial Mapping
 
@@ -57,5 +56,5 @@ You can create a partial string that will be as complete as possible from left t
 ```
 var str = map.Map(fileKey);
 ```
-The output here will be `/accounts/1234/`.
+Here `str` will have a value of `/accounts/1234/`.
 ```
