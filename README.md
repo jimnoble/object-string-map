@@ -56,4 +56,14 @@ You can create a partial string that will be as complete as possible from left t
 ```
 var str = map.Map(fileKey, allowPartialMap: true);
 ```
-Here `str` will have a value of `/accounts/1234/`.
+Here `str` will be `/accounts/1234/`.
+
+## Simple Data Types
+
+The data type does not need to be a class, and can instead be a simple data type, e.g. `int`, `Guid`, etc. In this case you can use `this` to refer to the data object itself in the map:
+```
+var map = new StringMap<int>("/accounts/{this}");
+
+var str = map.Map(123);
+```
+Here `str` will be `/accounts/123`
