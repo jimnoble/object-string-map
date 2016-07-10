@@ -1,6 +1,6 @@
-# Object-String Map
+# String Map
 
-Use a text map to turn objects into strings and back again. 
+Use a text map to turn simple objects into strings and back again. 
 
 Good for moving structured data into and out of file paths and URLs.
 
@@ -20,7 +20,7 @@ Create a new `StringMap` that describes how to turn your data to and from a stri
 var map = new StringMap<FileKey>(
     "/accounts/{AccountId}/{CreateTime:yyyy/MM/dd}/data.json");
 ```
-Use the map to turn an object into a string:
+Use the `StringMap` to turn an object into a `string`:
 ```
 var obj = new FileKey
 {
@@ -33,7 +33,7 @@ var str = map.Map(obj);
 ```
 Here `str` will be `/accounts/1234/2016/07/09/data.json`.
 
-Use the map to turn a string into an object:
+Use the `StringMap` to turn a `string` into an object:
 ```
 var str = "/accounts/1234/2016/07/09/data.json";
 
@@ -43,7 +43,7 @@ Here `obj` will equal the `FileKey` defined above.
 
 ## Partial Mapping
 
-Suppose in the above example that you have an AccountId but you do not know the CreateTime:
+Suppose in the above example that you have an `AccountId` but you do not know the `CreateTime`:
 ```
 var fileKey = new FileKey
 {
