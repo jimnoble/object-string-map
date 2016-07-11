@@ -1,4 +1,5 @@
-﻿using ObjectStringMapping.Interface;
+﻿using Object.Build.Implementation;
+using ObjectStringMapping.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,6 @@ namespace ObjectStringMap.Implementation
 {
     public class StringMap<TObject> : 
         IStringMap<TObject>
-        where TObject : new()
     {
         readonly Regex NodePattern = new Regex(
             @"\{(?<Name>[^}]+?)(:(?<Format>[^}]+)){0,1}}",
@@ -17,7 +17,7 @@ namespace ObjectStringMap.Implementation
 
         public StringMap(string mapSource)
         {
-            MapSource = mapSource;
+            Source = mapSource;
         }
 
         public static implicit operator StringMap<TObject>(string mapSource)
@@ -25,18 +25,23 @@ namespace ObjectStringMap.Implementation
             return new StringMap<TObject>(mapSource);
         }
 
-        public static implicit operator string(StringMap<TObject> objectStringMap)
+        public static implicit operator string(StringMap<TObject> stringMap)
         {
-            return objectStringMap?.MapSource;
+            return stringMap?.Source;
         }
 
-        public string MapSource { get; }
+        public string Source { get; }
+
+        public override string ToString()
+        {
+            return Source;
+        }
 
         public TObject Map(string str)
         {
             var pattern = new StringBuilder();
 
-            var nodeMatches = NodePattern.Matches(MapSource).Cast<Match>();
+            var nodeMatches = NodePattern.Matches(Source).Cast<Match>();
 
             var index = 0;
 
@@ -46,7 +51,7 @@ namespace ObjectStringMap.Implementation
             {
                 if (nodeMatch.Index > index)
                 {
-                    pattern.Append(Regex.Escape(MapSource.Substring(index, nodeMatch.Index - index)));
+                    pattern.Append(Regex.Escape(Source.Substring(index, nodeMatch.Index - index)));
                 }
 
                 var nodeName = nodeMatch.Groups["Name"].Value;
@@ -65,9 +70,9 @@ namespace ObjectStringMap.Implementation
                 index = nodeMatch.Index + nodeMatch.Length;
             }
 
-            if (index < MapSource.Length)
+            if (index < Source.Length)
             {
-                pattern.Append(Regex.Escape(MapSource.Substring(index)));
+                pattern.Append(Regex.Escape(Source.Substring(index)));
             }
 
             var match = Regex.Match(str, pattern.ToString());
@@ -89,7 +94,7 @@ namespace ObjectStringMap.Implementation
             }
             else
             {
-                obj = new TObject();
+                var builder = new Builder<TObject>();
 
                 foreach (var property in typeof(TObject).GetProperties())
                 {
@@ -102,8 +107,10 @@ namespace ObjectStringMap.Implementation
                         name,
                         format);
 
-                    property.SetValue(obj, typedValue);
+                    builder.Set(property.Name, typedValue);
                 }
+
+                obj = builder.Build();
             }
 
             return obj;
@@ -115,7 +122,7 @@ namespace ObjectStringMap.Implementation
         {
             var output = new StringBuilder();
 
-            var nodeMatches = NodePattern.Matches(MapSource).Cast<Match>();
+            var nodeMatches = NodePattern.Matches(Source).Cast<Match>();
 
             var index = 0;
 
@@ -123,7 +130,7 @@ namespace ObjectStringMap.Implementation
             {
                 if (nodeMatch.Index > index)
                 {
-                    output.Append(MapSource.Substring(index, nodeMatch.Index - index));
+                    output.Append(Source.Substring(index, nodeMatch.Index - index));
                 }
 
                 var name = nodeMatch.Groups["Name"].Value;
@@ -149,9 +156,9 @@ namespace ObjectStringMap.Implementation
                 index = nodeMatch.Index + nodeMatch.Length;
             }
 
-            if (index < MapSource.Length)
+            if (index < Source.Length)
             {
-                output.Append(MapSource.Substring(index));
+                output.Append(Source.Substring(index));
             }
 
             return output.ToString();
@@ -221,8 +228,14 @@ namespace ObjectStringMap.Implementation
             }
             else
             {
+                if(type.IsGenericType && 
+                    type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                {
+                    type = type.GetGenericArguments().Single();
+                }
+
                 return Convert.ChangeType(stringValue, type);
             }
         }
-}
+    }
 }

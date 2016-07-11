@@ -1,9 +1,9 @@
-﻿namespace ObjectStringMapping.Interface
+﻿
+namespace ObjectStringMapping.Interface
 {
     public interface IStringMap<TObject>
-        where TObject : new()
     {
-        string MapSource { get; }
+        string Source { get; }
 
         TObject Map(string str);
 

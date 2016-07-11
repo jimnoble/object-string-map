@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectStringMap", "ObjectSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectStringMap.Tests", "ObjectStringMap.Tests\ObjectStringMap.Tests.csproj", "{6F78F5CE-42F3-426B-A35C-1C7E27EDD3D6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{E6C2D7B3-252C-4730-A40D-FA425AFEC77A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Object.Build", "object-build\Object.Build\Object.Build.csproj", "{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,15 @@ Global
 		{6F78F5CE-42F3-426B-A35C-1C7E27EDD3D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F78F5CE-42F3-426B-A35C-1C7E27EDD3D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F78F5CE-42F3-426B-A35C-1C7E27EDD3D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C7A937F0-CDFE-48CD-9E6A-B03D6C01E475} = {E6C2D7B3-252C-4730-A40D-FA425AFEC77A}
 	EndGlobalSection
 EndGlobal

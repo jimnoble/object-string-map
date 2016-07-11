@@ -41,10 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementation\StringMap.cs" />
-    <Compile Include="Implementation\ObjectStringMapper.cs" />
-    <Compile Include="Interface\IObjectStringMapper.cs" />
     <Compile Include="Interface\IStringMap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\object-build\Object.Build\Object.Build.csproj">
+      <Project>{c7a937f0-cdfe-48cd-9e6a-b03d6c01e475}</Project>
+      <Name>Object.Build</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

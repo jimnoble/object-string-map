@@ -51,7 +51,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="StringMapTests.cs" />
-    <Compile Include="ObjectStringMapperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
