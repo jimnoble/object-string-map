@@ -98,13 +98,15 @@ namespace ObjectStringMap.Implementation
 
                 foreach (var property in typeof(TObject).GetProperties())
                 {
-                    var name = match.Groups[property.Name].Value;
+                    var name = property.Name;
+
+                    var value = match.Groups[name].Value;
 
                     format = formats.TryGetValue(name, out format) ? format : null;
 
                     var typedValue = TypeString(
                         property.PropertyType,
-                        name,
+                        value,
                         format);
 
                     builder.Set(property.Name, typedValue);
