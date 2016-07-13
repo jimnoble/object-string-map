@@ -11,7 +11,13 @@ namespace ObjectStringMap.Implementation
     public class StringMap<TObject> : 
         IStringMap<TObject>
     {
-        readonly Regex NodePattern = new Regex(
+        const string NameGroupKey = "Name";
+
+        const string FormatGroupKey = "Format";
+
+        const string ThisKeyword = "this";
+
+        static readonly Regex NodePattern = new Regex(
             @"\{(?<Name>[^}]+?)(:(?<Format>[^}]+)){0,1}}",
             RegexOptions.Compiled);
 
@@ -54,9 +60,9 @@ namespace ObjectStringMap.Implementation
                     pattern.Append(Regex.Escape(Source.Substring(index, nodeMatch.Index - index)));
                 }
 
-                var nodeName = nodeMatch.Groups["Name"].Value;
+                var nodeName = nodeMatch.Groups[NameGroupKey].Value;
 
-                var nodeFormat = nodeMatch.Groups["Format"].Value;
+                var nodeFormat = nodeMatch.Groups[FormatGroupKey].Value;
 
                 if (!string.IsNullOrWhiteSpace(nodeFormat))
                 {
@@ -79,13 +85,13 @@ namespace ObjectStringMap.Implementation
 
             var obj = default(TObject);
 
-            var thisGroup = match.Groups["this"];
+            var thisGroup = match.Groups[ThisKeyword];
 
             var format = default(string);
 
             if (thisGroup.Success)
             {
-                formats.TryGetValue("this", out format);
+                formats.TryGetValue(ThisKeyword, out format);
 
                 obj = (TObject)TypeString(
                     typeof(TObject),
@@ -135,9 +141,9 @@ namespace ObjectStringMap.Implementation
                     output.Append(Source.Substring(index, nodeMatch.Index - index));
                 }
 
-                var name = nodeMatch.Groups["Name"].Value;
+                var name = nodeMatch.Groups[NameGroupKey].Value;
 
-                var format = nodeMatch.Groups["Format"].Value;
+                var format = nodeMatch.Groups[FormatGroupKey].Value;
 
                 var value = ResolveValue(obj, name, format);
 
@@ -173,7 +179,7 @@ namespace ObjectStringMap.Implementation
         {
             var value = default(object);
 
-            if(name == "this")
+            if(name == ThisKeyword)
             {
                 value = obj;
             }
