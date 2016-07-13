@@ -68,7 +68,7 @@ namespace ObjectStringMap.Implementation
             {
                 parseInfo.Formats.TryGetValue(ThisKeyword, out format);
 
-                var typedValue = TypeString(
+                var typedValue = ConvertStringToType(
                     typeof(TObject),
                     thisGroup.Value,
                     format);
@@ -92,7 +92,7 @@ namespace ObjectStringMap.Implementation
 
                     format = parseInfo.Formats.TryGetValue(name, out format) ? format : null;
 
-                    var typedValue = TypeString(
+                    var typedValue = ConvertStringToType(
                         property.PropertyType,
                         value,
                         format);
@@ -214,7 +214,7 @@ namespace ObjectStringMap.Implementation
             return $"(?<{name}>.*)";
         }
 
-        static object TypeString(
+        static object ConvertStringToType(
             Type type, 
             string stringValue,
             string format)
