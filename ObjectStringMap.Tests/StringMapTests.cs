@@ -204,6 +204,54 @@ namespace ObjectStringMap.Tests
         }
 
         [TestMethod]
+        [TestCategory("Unit")]
+        public void MapObject_WhenInvalidValue_ThenDefault()
+        {
+            var map = new StringMap<Wrapper<Guid>>("alfa/{Property}/bravo");
+
+            var str = "alfa/not-a-guid/bravo";
+
+            var obj = map.Map(str);
+
+            Assert.IsNull(obj);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void MapObject_WhenPatternNotMatched_ThenDefault()
+        {
+            var map = new StringMap<Wrapper<Guid>>("alfa/{Property}/bravo");
+
+            var str = "alfa/ff14cea6a92c4a82bd8478c3d17220d2/charlie";
+
+            var obj = map.Map(str);
+
+            Assert.IsNull(obj);
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void IsMatch_WhenIsMatch_ThenTrue()
+        {
+            var map = new StringMap<Wrapper<Guid>>("alfa/{Property}/bravo");
+
+            var str = "alfa/ff14cea6a92c4a82bd8478c3d17220d2/bravo";
+
+            Assert.IsTrue(map.IsMatch(str));
+        }
+
+        [TestMethod]
+        [TestCategory("Unit")]
+        public void IsMatch_WhenIsNotMatch_ThenFalse()
+        {
+            var map = new StringMap<Wrapper<Guid>>("alfa/{Property}/bravo");
+
+            var str = "alfa/ff14cea6a92c4a82bd8478c3d17220d2/charlie";
+
+            Assert.IsFalse(map.IsMatch(str));
+        }
+
+        [TestMethod]
         [TestCategory("Speed")]
         public void MapObject_Guid_SpeedTest()
         {

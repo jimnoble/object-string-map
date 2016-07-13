@@ -21,14 +21,18 @@ namespace ObjectStringMap.Implementation
             @"\{(?<Name>[^}]+?)(:(?<Format>[^}]+)){0,1}}",
             RegexOptions.Compiled);
 
-        public StringMap(string mapSource)
+        readonly Lazy<ParseInfo> _parseInfo;
+
+        public StringMap(string source)
         {
-            Source = mapSource;
+            Source = source;
+
+            _parseInfo = new Lazy<ParseInfo>(() => ResolveParseInfo(source));
         }
 
-        public static implicit operator StringMap<TObject>(string mapSource)
+        public static implicit operator StringMap<TObject>(string source)
         {
-            return new StringMap<TObject>(mapSource);
+            return new StringMap<TObject>(source);
         }
 
         public static implicit operator string(StringMap<TObject> stringMap)
@@ -45,58 +49,36 @@ namespace ObjectStringMap.Implementation
 
         public TObject Map(string str)
         {
-            var pattern = new StringBuilder();
+            var parseInfo = _parseInfo.Value;
 
-            var nodeMatches = NodePattern.Matches(Source).Cast<Match>();
+            var match = parseInfo.Regex.Match(str);
 
-            var index = 0;
-
-            var formats = new Dictionary<string, string>();
-
-            foreach (var nodeMatch in nodeMatches)
+            if (!match.Success)
             {
-                if (nodeMatch.Index > index)
-                {
-                    pattern.Append(Regex.Escape(Source.Substring(index, nodeMatch.Index - index)));
-                }
-
-                var nodeName = nodeMatch.Groups[NameGroupKey].Value;
-
-                var nodeFormat = nodeMatch.Groups[FormatGroupKey].Value;
-
-                if (!string.IsNullOrWhiteSpace(nodeFormat))
-                {
-                    formats.Add(nodeName, nodeFormat);
-                }
-
-                var nodePattern = ResolvePattern(nodeName);
-
-                pattern.Append(nodePattern);
-
-                index = nodeMatch.Index + nodeMatch.Length;
+                return default(TObject);
             }
-
-            if (index < Source.Length)
-            {
-                pattern.Append(Regex.Escape(Source.Substring(index)));
-            }
-
-            var match = Regex.Match(str, pattern.ToString());
-
-            var obj = default(TObject);
 
             var thisGroup = match.Groups[ThisKeyword];
 
             var format = default(string);
 
+            var obj = default(TObject);
+
             if (thisGroup.Success)
             {
-                formats.TryGetValue(ThisKeyword, out format);
+                parseInfo.Formats.TryGetValue(ThisKeyword, out format);
 
-                obj = (TObject)TypeString(
+                var typedValue = TypeString(
                     typeof(TObject),
                     thisGroup.Value,
                     format);
+
+                if(typedValue == null)
+                {
+                    return default(TObject);
+                }
+
+                obj = (TObject)typedValue;
             }
             else
             {
@@ -108,12 +90,17 @@ namespace ObjectStringMap.Implementation
 
                     var value = match.Groups[name].Value;
 
-                    format = formats.TryGetValue(name, out format) ? format : null;
+                    format = parseInfo.Formats.TryGetValue(name, out format) ? format : null;
 
                     var typedValue = TypeString(
                         property.PropertyType,
                         value,
                         format);
+
+                    if(typedValue == null)
+                    {
+                        return default(TObject);
+                    }
 
                     builder.Set(property.Name, typedValue);
                 }
@@ -155,7 +142,9 @@ namespace ObjectStringMap.Implementation
                     }
                     else
                     {
-                        throw new ArgumentNullException(name);
+                        throw new ArgumentNullException(
+                            name, 
+                            $"A required value was null while mapping {typeof(TObject).Name} to a string.");
                     }
                 }
 
@@ -170,6 +159,11 @@ namespace ObjectStringMap.Implementation
             }
 
             return output.ToString();
+        }
+
+        public bool IsMatch(string str)
+        {
+            return _parseInfo.Value.Regex.IsMatch(str);
         }
 
         static string ResolveValue(
@@ -225,25 +219,93 @@ namespace ObjectStringMap.Implementation
             string stringValue,
             string format)
         {
-            if (type.Equals(typeof(Guid)) || type.Equals(typeof(Guid?)))
+            try
             {
-                return Guid.Parse(stringValue);
-            }
-            else if((type.Equals(typeof(DateTime)) || type.Equals(typeof(DateTime?))) &&
-                !string.IsNullOrWhiteSpace(format))
-            {
-                return DateTime.ParseExact(stringValue, format, null);
-            }
-            else
-            {
-                if(type.IsGenericType && 
-                    type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                if (type.Equals(typeof(Guid)) || type.Equals(typeof(Guid?)))
                 {
-                    type = type.GetGenericArguments().Single();
+                    return Guid.Parse(stringValue);
+                }
+                else if ((type.Equals(typeof(DateTime)) || type.Equals(typeof(DateTime?))) &&
+                    !string.IsNullOrWhiteSpace(format))
+                {
+                    return DateTime.ParseExact(stringValue, format, null);
+                }
+                else
+                {
+                    if (type.IsGenericType &&
+                        type.GetGenericTypeDefinition().Equals(typeof(Nullable<>)))
+                    {
+                        type = type.GetGenericArguments().Single();
+                    }
+
+                    return Convert.ChangeType(stringValue, type);
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        static ParseInfo ResolveParseInfo(string source)
+        {
+            var pattern = new StringBuilder();
+
+            var nodeMatches = NodePattern.Matches(source).Cast<Match>();
+
+            var index = 0;
+
+            var formats = new Dictionary<string, string>();
+
+            foreach (var nodeMatch in nodeMatches)
+            {
+                if (nodeMatch.Index > index)
+                {
+                    pattern.Append(Regex.Escape(source.Substring(index, nodeMatch.Index - index)));
                 }
 
-                return Convert.ChangeType(stringValue, type);
+                var nodeName = nodeMatch.Groups[NameGroupKey].Value;
+
+                var nodeFormat = nodeMatch.Groups[FormatGroupKey].Value;
+
+                if (!string.IsNullOrWhiteSpace(nodeFormat))
+                {
+                    formats.Add(nodeName, nodeFormat);
+                }
+
+                var nodePattern = ResolvePattern(nodeName);
+
+                pattern.Append(nodePattern);
+
+                index = nodeMatch.Index + nodeMatch.Length;
             }
+
+            if (index < source.Length)
+            {
+                pattern.Append(Regex.Escape(source.Substring(index)));
+            }
+
+            var regex = new Regex(
+                pattern.ToString(),
+                RegexOptions.Compiled);
+
+            return new ParseInfo(formats, regex);
+        }
+
+        class ParseInfo
+        {
+            public ParseInfo(
+                Dictionary<string, string> formats,
+                Regex regex)
+            {
+                Formats = formats;
+
+                Regex = regex;
+            }
+
+            public Dictionary<string, string> Formats { get; }
+
+            public Regex Regex { get; }
         }
     }
 }

@@ -9,6 +9,8 @@ namespace ObjectStringMapping.Interface
 
         string Map(
             TObject obj,
-            bool allowPartialMap = false);            
+            bool allowPartialMap = false);
+
+        bool IsMatch(string str);
     }
 }
